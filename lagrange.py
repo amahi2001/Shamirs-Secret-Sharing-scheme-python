@@ -19,7 +19,6 @@ import numpy as np
 import numpy.polynomial.polynomial as poly
 
 
-
 def test_everything(obj: "Lagrange"):
     ###########Testing encrypt############
     secret = random.randint(-(10**4), 10**4 + 1)
@@ -181,12 +180,12 @@ class Lagrange:
             elif type(shares) == list:
                 parsed_shares = shares
             else:
-                raise Exception(
+                raise TypeError(
                     "please enter shares as a list of tuples or a string of shares of the form 'x,y x,y'"
                 )
             minimum_shares = int(minimum_shares)
             if minimum_shares > len(parsed_shares):
-                raise Exception("not enough shares to decrypt")
+                raise ValueError("not enough shares to decrypt")
             # randomly picking {minimum_shares} shares to use
             parsed_shares = random.sample(parsed_shares, minimum_shares)
             return interpolate(parsed_shares)
