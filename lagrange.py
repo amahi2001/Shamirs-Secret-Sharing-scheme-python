@@ -1,16 +1,17 @@
 """
-    Abrar Mahi
-    Python Version 3.11
-    
-    -Please enter the message as an integer
+Abrar Mahi
+Python Version 3.11
 
-    -Please enter shares in the format:
-        "x0,y0 x1,y1, ... xn,yn"
-        where there are: 
-        1. spaces between each x,y pair
-        2. no spaces between x,y
-        3. x,y are comma separated
+-Please enter the message as an integer
+
+-Please enter shares in the format:
+    "x0,y0 x1,y1, ... xn,yn"
+    where there are:
+    1. spaces between each x,y pair
+    2. no spaces between x,y
+    3. x,y are comma separated
 """
+
 import random
 from decimal import Decimal
 from typing import List, Tuple
@@ -34,10 +35,10 @@ def test_everything(obj: "Lagrange"):
     decrypted_secret = obj.decrypt(minimum_shares, shares)
     if decrypted_secret == secret:
         print(
-            f"secret decrypted successfully {decrypted_secret} \N{smiling face with sunglasses}\n"
+            f"secret decrypted successfully {decrypted_secret} \N{SMILING FACE WITH SUNGLASSES}\n"
         )
     else:
-        print(f"decryption failed {decrypted_secret} != {secret} \N{angry face}\n")
+        print(f"decryption failed {decrypted_secret} != {secret} \N{ANGRY FACE}\n")
 
     ###########Testing generate_new_shares############
     new_share_num = random.randint(
@@ -48,11 +49,11 @@ def test_everything(obj: "Lagrange"):
     new_decrypted_secret = obj.decrypt(minimum_shares, new_shares)
     if new_decrypted_secret == secret:
         print(
-            f"secret decrypted successfully {decrypted_secret} == {secret} \N{smiling face with sunglasses}\n"
+            f"secret decrypted successfully {decrypted_secret} == {secret} \N{SMILING FACE WITH SUNGLASSES}\n"
         )
     else:
         print(
-            f"new shares decryption failed {decrypted_secret} != {secret} \N{angry face}\n"
+            f"new shares decryption failed {decrypted_secret} != {secret} \N{ANGRY FACE}\n"
         )
 
 
@@ -81,13 +82,17 @@ def shares_to_list(shares: str):
         result = [tuple(map(int, x.split(","))) for x in result]
         return result
     except Exception as e:
-        print("Please enter shares in the format: x0,y0 x1,y1, ... xn,yn")
-        raise e
+        raise ValueError(
+            "Please enter shares in the format: x0,y0 x1,y1, ... xn,yn"
+        ) from e
 
 
 class Lagrange:
-    def __init__(self):
-        pass
+    def __init__(self, message: int, minimum_shares: int, num_of_shares: list):
+        self.message = message
+        self.min_shares = minimum_shares
+        self.num_shares = num_of_shares
+        self.shares = self.encrypt()
 
     def generate_new_shares(
         self, minimum_shares: int, shares: list, number_of_new_shares: int
@@ -120,9 +125,7 @@ class Lagrange:
 
         # generating new shares
 
-    def encrypt(
-        self, message: int, minimum_shares: int, share_number: int
-    ) -> List[Tuple]:
+    def encrypt(self) -> List[Tuple]:
         """
         # Parameters
         message: a message you wish to encrypt, you can choose to simply encode numbers or, for extra credit, you can convert plaintext messages to a number representation and encode that
@@ -133,15 +136,11 @@ class Lagrange:
         this function outputs coordinate pairs (the secret shares) that can be handed out to the end user
         """
         try:
-            message = int(message)
-            minimum_shares = int(minimum_shares)
-            share_number = int(share_number)
-
             # calculating degree of polynomial
-            degree_of_poly = minimum_shares - 1
+            degree_of_poly = self.min_shares - 1
 
             # generating random coefficients for the polynomial
-            coeff = [message]
+            coeff = [self.message]
             for _ in range(degree_of_poly):
                 coeff.append(random.randint(1, 50))
             # print('random coeficients generated:', coeff)
@@ -151,7 +150,7 @@ class Lagrange:
             # print('polynomial:',  polynomial)
 
             # generating {share_number} random x-coordinate values
-            x_values = [random.randint(1, 300) for _ in range(1, share_number + 1)]
+            x_values = [random.randint(1, 300) for _ in range(1, self.num_shares + 1)]
             # print('random x values generated: ', x_values)
 
             # generating the y-coordinate values
@@ -163,8 +162,9 @@ class Lagrange:
             return shares
         except Exception as e:
             raise e
-
-    def decrypt(self, minimum_shares: int, shares: list):
+    
+    @classmethod
+    def decrypt(cls, minimum_shares: int, shares: list = cls.shares):
         """
         30 points
         # Parameters
@@ -201,39 +201,6 @@ def main():
         print("\ntest", i)
         print("================")
         test_everything(interpolation)
-    # choice = input(
-    #     "Do you want to encrypt or decrypt a secret or generate new shares (e/d/g)?"
-    # )
-
-    # if choice == "e":
-    #     message = input("What is the secret you wish to encrypt?: ")
-    #     minimum_shares = input(
-    #         "What is the minimum number of shares you wish to deploy?: "
-    #     )
-    #     share_number = input(
-    #         "What is the minimum number of shares you wish to generate?: "
-    #     )
-    #     encryption = interpolation.encrypt(message, minimum_shares, share_number)
-    #     print(encryption)
-
-    # elif choice == "d":
-    #     minimum_shares = input(
-    #         "What is the minimum number of shares you need to decrypt?"
-    #     )
-    #     shares = input("What shares do you have?")
-    #     decryption = interpolation.decrypt(minimum_shares, share_number)
-    #     print(decryption)
-
-    # elif choice == "g":
-    #     minimum_shares = input(
-    #         "What is the minimum number of shares you need to decrypt?"
-    #     )
-    #     shares = input("What shares do you have?")
-    #     share_number = input("What is the number of new shares you want to generate?")
-    #     new_shares = interpolation.generate_new_shares(
-    #         minimum_shares, shares, share_number
-    #     )
-    #     print(new_shares)
 
 
 if __name__ == "__main__":
